@@ -336,6 +336,83 @@ export const seoSchema = z.object({
 })
 
 // ---------------------------------------------------------------------------
+// Sala de espera
+// ---------------------------------------------------------------------------
+
+/**
+ * Pantalla de lanzamiento en vivo, en `/{slug}/sala`.
+ *
+ * Es un recurso aparte de la landing: no vende ni pide datos, se proyecta en la
+ * transmisión durante los minutos previos a empezar. Por eso cuenta hacia una
+ * duración que elige quien opera —no hacia `event.date`—, y por eso el reloj de
+ * la landing (`useOfferWindow`) no le sirve.
+ *
+ * Todo tiene default, así que el bloque es opcional: cualquier evento ya
+ * publicado tiene su sala sin tocar el config.
+ */
+export const waitingRoomSchema = z
+  .object({
+    /** Minutos con los que abre el selector. */
+    defaultMinutes: z.number().int().min(1).max(180).default(10),
+    /** Atajos de duración bajo el selector. Vacío los oculta. */
+    presetMinutes: z.array(z.number().int().min(1).max(180)).default([1, 5, 10, 15, 30]),
+
+    /** Pantalla previa: la ve quien opera antes de arrancar el conteo. */
+    intro: z
+      .object({
+        eyebrow: z.string().default("En vivo · Estamos por comenzar"),
+        title: z.string().default("El evento está a punto de"),
+        /** Se pinta con el color de marca, igual que en el hero. */
+        titleHighlight: z.string().default("empezar"),
+        body: z
+          .string()
+          .default(
+            "Acomodate, silenciá las notificaciones y preparate. Elegí los minutos y arrancá cuando quieras."
+          ),
+        durationLabel: z.string().default("Duración del conteo"),
+        startLabel: z.string().default("Iniciar"),
+        hint: z.string().default("o presioná Espacio"),
+      })
+      .prefault({}),
+
+    /** Durante el conteo. */
+    counting: z
+      .object({
+        label: z.string().default("Comenzamos en"),
+        caption: z.string().default("La sesión arranca cuando el reloj llegue a cero."),
+      })
+      .prefault({}),
+
+    /** Al llegar a cero. */
+    final: z
+      .object({
+        eyebrow: z.string().default("Es hora"),
+        title: z.string().default("¡Comenzamos!"),
+        body: z.string().optional(),
+        againLabel: z.string().default("Volver a empezar"),
+      })
+      .prefault({}),
+
+    /**
+     * Mensajes que flotan como burbujas de chat mientras corre el reloj.
+     * Rescatados de una edición anterior, calientan la sala antes de que haya
+     * alguien hablando. Sin mensajes, la capa no se monta.
+     */
+    chat: z.array(z.object({ name: z.string().min(1), text: z.string().min(1) })).default([]),
+
+    /** Confeti al llegar a cero. Se respeta `prefers-reduced-motion`. */
+    confetti: z.boolean().default(true),
+    /** Pide pantalla completa al iniciar. Si el navegador la niega, sigue igual. */
+    fullscreen: z.boolean().default(true),
+  })
+  /**
+   * `prefault` y no `default`: en Zod 4 el valor de `default` se devuelve tal
+   * cual, sin pasar por el esquema, así que un `{}` dejaría la sala sin ningún
+   * texto. `prefault` sí lo parsea y aplica los defaults de cada campo.
+   */
+  .prefault({})
+
+// ---------------------------------------------------------------------------
 // Configuración completa del evento
 // ---------------------------------------------------------------------------
 
@@ -430,6 +507,9 @@ const eventConfigObject = z.object({
       minutes: "min",
       seconds: "seg",
     }),
+
+  /** Pantalla de lanzamiento en vivo, en `/{slug}/sala`. Opcional. */
+  waitingRoom: waitingRoomSchema,
 })
 
 /**
@@ -493,6 +573,8 @@ export type FormField = z.infer<typeof formFieldSchema>
 export type SuccessConfig = z.infer<typeof successSchema>
 export type AnalyticsConfig = z.infer<typeof analyticsSchema>
 export type CountdownLabels = EventConfig["countdownLabels"]
+export type WaitingRoomConfig = z.infer<typeof waitingRoomSchema>
+export type ChatMessage = WaitingRoomConfig["chat"][number]
 
 /** Extrae el tipo de una sección concreta, ej. `SectionOf<"hero">`. */
 export type SectionOf<T extends SectionType> = Extract<SectionConfig, { type: T }>

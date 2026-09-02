@@ -6,8 +6,9 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      // Las paginas de gracias no aportan nada como resultado de busqueda.
-      disallow: ["/api/", "/*/registro"],
+      // Ni las paginas de gracias ni la sala de espera aportan nada como
+      // resultado de busqueda: son destinos internos del propio evento.
+      disallow: ["/api/", "/*/registro", "/*/sala"],
     },
     sitemap: `${getSiteUrl()}/sitemap.xml`,
   }
