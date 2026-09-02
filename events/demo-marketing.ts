@@ -61,6 +61,28 @@ export default defineEvent({
     seconds: "seg",
   },
 
+  waitingRoom: {
+    defaultMinutes: 10,
+    intro: {
+      title: "El webinar está a punto de",
+      titleHighlight: "empezar",
+    },
+    final: {
+      title: "¡Comenzamos!",
+      body: "Bienvenido a Citas que sí llegan. Tomá nota: en los próximos 60 minutos armamos tu sistema.",
+    },
+    // Mensajes reales de la edición anterior. Rotan durante el conteo para que
+    // la sala no arranque en silencio.
+    chat: [
+      { name: "Valentina Ríos", text: "¡Buenas! Llegando desde Medellín 👋" },
+      { name: "Marcos Peña", text: "Vengo de la edición pasada, se aprende muchísimo" },
+      { name: "Clínica Sonrisas", text: "Presentes, con cuaderno en mano" },
+      { name: "Daniela Ortiz", text: "Justo lo que necesitaba esta semana" },
+      { name: "Estudio Norte", text: "¿Queda grabado? Igual me quedo en vivo 😄" },
+      { name: "Equipo", text: "¡Sí, queda grabado! Arrancamos en unos minutos" },
+    ],
+  },
+
   form: {
     leadTag: "webinar-demo-marketing",
     fields: [

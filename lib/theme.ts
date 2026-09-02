@@ -80,14 +80,21 @@ const RADIUS_SCALE: Record<ThemeConfig["radius"], { sm: string; md: string; lg: 
  * comporten al revés. En vez de duplicar clases por todo el árbol, derivamos
  * dos tokens más y los componentes los usan sin saber qué preset está activo.
  */
-function isDarkSurface(tokens: ThemeTokens): boolean {
-  const hex = tokens.surface.replace("#", "")
-  if (hex.length !== 6) return false
+function perceivedLuminance(color: string): number | null {
+  const hex = color.trim().replace("#", "")
+  if (hex.length !== 6) return null
   const r = parseInt(hex.slice(0, 2), 16)
   const g = parseInt(hex.slice(2, 4), 16)
   const b = parseInt(hex.slice(4, 6), 16)
-  // Luminancia percibida (Rec. 601). Por debajo de 128 tratamos el fondo como oscuro.
-  return (r * 299 + g * 587 + b * 114) / 1000 < 128
+  if ([r, g, b].some(Number.isNaN)) return null
+  // Luminancia percibida (Rec. 601), de 0 a 255.
+  return (r * 299 + g * 587 + b * 114) / 1000
+}
+
+function isDarkSurface(tokens: ThemeTokens): boolean {
+  const luminance = perceivedLuminance(tokens.surface)
+  // Por debajo de 128 tratamos el fondo como oscuro.
+  return luminance !== null && luminance < 128
 }
 
 export function resolveTokens(theme: ThemeConfig): ThemeTokens {
@@ -122,5 +129,42 @@ export function themeToCssVars(theme: ThemeConfig): CSSProperties {
     // Borde sutil que funciona en ambos extremos de luminancia.
     "--hairline": dark ? "rgba(255,255,255,0.12)" : "rgba(16,26,44,0.10)",
     "--elevated": dark ? "rgba(255,255,255,0.04)" : "rgba(16,26,44,0.04)",
+  } as CSSProperties
+}
+
+/** Telón de fondo cuando el tema no aporta ningún color lo bastante oscuro. */
+const STAGE_FALLBACK_BG = "#0B1017"
+
+/**
+ * Variables del escenario de la sala de espera.
+ *
+ * La sala se proyecta en una pantalla grande, muchas veces con las luces bajas:
+ * ahí un fondo claro encandila. Sea cual sea el preset, el escenario se arma
+ * siempre oscuro, tomando prestado el más oscuro de los dos colores del tema y
+ * usando el otro como texto. Así la sala combina con la landing sin exigirle al
+ * config una paleta aparte.
+ */
+export function stageCssVars(theme: ThemeConfig): CSSProperties {
+  const tokens = resolveTokens(theme)
+  const inkLuminance = perceivedLuminance(tokens.ink)
+  const surfaceLuminance = perceivedLuminance(tokens.surface)
+
+  // Sin hex parseable no hay comparación posible; `ink` es la apuesta correcta
+  // en cuatro de los cinco presets.
+  const inkIsDarker =
+    inkLuminance === null || surfaceLuminance === null ? true : inkLuminance <= surfaceLuminance
+
+  const backdrop = inkIsDarker ? tokens.ink : tokens.surface
+  const foreground = inkIsDarker ? tokens.surface : tokens.ink
+  const backdropLuminance = perceivedLuminance(backdrop)
+  const tooLight = backdropLuminance !== null && backdropLuminance > 80
+
+  return {
+    "--stage-bg": tooLight ? STAGE_FALLBACK_BG : backdrop,
+    "--stage-fg": foreground,
+    // Sobre un telón oscuro los velos blancos funcionan con cualquier paleta.
+    "--stage-panel": "rgba(255,255,255,0.05)",
+    "--stage-line": "rgba(255,255,255,0.14)",
+    "--stage-muted": "rgba(255,255,255,0.62)",
   } as CSSProperties
 }

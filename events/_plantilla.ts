@@ -80,6 +80,20 @@ export default defineEvent({
     seconds: "seg",
   },
 
+  // Sala de espera en /mi-webinar/sala: la pantalla que se proyecta en la
+  // transmisión durante los minutos previos. El bloque entero es opcional —
+  // sin él la sala igual existe, con los textos por defecto.
+  //
+  // waitingRoom: {
+  //   defaultMinutes: 10,
+  //   presetMinutes: [1, 5, 10, 15, 30],
+  //   intro: { title: "El taller está por", titleHighlight: "empezar" },
+  //   counting: { label: "Comenzamos en" },
+  //   final: { title: "¡Comenzamos!", body: "Bienvenido a la sesión." },
+  //   // Mensajes de una edición anterior, para que la sala no se vea vacía:
+  //   chat: [{ name: "Ana", text: "¡Qué ganas de empezar!" }],
+  // },
+
   form: {
     leadTag: "mi-webinar",
     // Los nombres de los campos son las claves con las que viajan al webhook.

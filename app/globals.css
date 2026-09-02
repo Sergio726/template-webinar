@@ -22,6 +22,13 @@
   --color-hairline: var(--hairline);
   --color-elevated: var(--elevated);
 
+  /* Escenario de la sala de espera; los emite `stageCssVars`. */
+  --color-stage: var(--stage-bg);
+  --color-stage-fg: var(--stage-fg);
+  --color-stage-panel: var(--stage-panel);
+  --color-stage-line: var(--stage-line);
+  --color-stage-muted: var(--stage-muted);
+
   --font-sans: var(--font-sans-active);
   --font-display: var(--font-display-active);
 }
@@ -42,6 +49,11 @@
   --surface-alt: #ffffff;
   --hairline: rgba(16, 26, 44, 0.1);
   --elevated: rgba(16, 26, 44, 0.04);
+  --stage-bg: #0b1017;
+  --stage-fg: #f7f8fb;
+  --stage-panel: rgba(255, 255, 255, 0.05);
+  --stage-line: rgba(255, 255, 255, 0.14);
+  --stage-muted: rgba(255, 255, 255, 0.62);
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
   --radius-lg: 1rem;
@@ -153,9 +165,42 @@
   pointer-events: none;
 }
 
+/*
+ * Aura que late detrás del reloj de la sala de espera. Va en CSS y no en
+ * `motion` porque es una animación infinita de fondo: dejarla en el compositor
+ * evita mantener un componente animado vivo durante toda la transmisión.
+ */
+@keyframes stage-breath {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.65;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.12);
+    opacity: 1;
+  }
+}
+
+.stage-aura {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: min(120vw, 1100px);
+  height: min(120vw, 1100px);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  background: radial-gradient(circle, color-mix(in srgb, var(--brand) 18%, transparent) 0%, transparent 60%);
+  animation: stage-breath 4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .stage-aura {
+    animation: none;
   }
 
   .cta-shine,

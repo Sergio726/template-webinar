@@ -35,7 +35,8 @@ const RAW = [demoMarketing, demoSalud, miWebinar]
 ```
 
 **4. Listo.** La ruta `/mi-webinar`, la página de gracias `/mi-webinar/registro`,
-la imagen para compartir y la entrada del sitemap salen solas del slug.
+la sala de espera `/mi-webinar/sala`, la imagen para compartir y la entrada del
+sitemap salen solas del slug.
 
 Si el evento tiene imágenes propias, ponelas en `public/eventos/mi-webinar/` y
 referencialas como `/eventos/mi-webinar/foto.jpg`.
@@ -51,11 +52,13 @@ events/            Un archivo por webinar. Es lo único que se edita a diario.
 app/
   [slug]/          La landing. El tema del evento se aplica en su layout.
   [slug]/registro/ Página de gracias, para campañas que registran por fuera.
+  [slug]/sala/     Sala de espera: la pantalla que se proyecta antes de empezar.
   api/register/    Recibe el formulario y lo reenvía al webhook.
 components/
   sections/        Una sección por tipo, más el renderizador.
   ui/              Botón, countdown, acordeón, campos, fondos.
   form/            Selector de país y tarjeta de éxito.
+  waiting-room/    Reloj, burbujas de chat y confeti de la sala de espera.
 lib/
   types.ts         El esquema del config. La pieza central del proyecto.
   theme.ts         Los presets de color.
@@ -96,6 +99,50 @@ entera, incluidos el fondo decorativo y la imagen para compartir.
 
 También se eligen el fondo (`mesh`, `grid`, `waves`, `aurora`, `none`), el
 redondeo (`sharp`, `soft`, `round`) y el par de fuentes.
+
+---
+
+## La sala de espera
+
+Cada evento tiene, además de su landing, una pantalla de lanzamiento en vivo en
+`/{slug}/sala`. Se comparte en la transmisión durante los minutos previos: quien
+opera elige la duración, pulsa **Iniciar** y el reloj corre hasta cero, con
+burbujas de chat de fondo y confeti al llegar.
+
+Es un recurso aparte de la landing y no una sección más, porque hace otra cosa:
+no vende ni pide datos, se ve a varios metros de distancia y su reloj cuenta una
+duración elegida a mano, no la fecha del config. Va sin indexar y fuera del
+sitemap.
+
+Al colgar del layout del evento hereda su tema y sus fuentes, y el escenario se
+arma siempre oscuro: toma el más oscuro de los colores del tema como telón y el
+otro como texto, así combina con la landing sin encandilar en una sala a media
+luz.
+
+**Cómo se usa en vivo:** abrí `/{slug}/sala`, elegí los minutos y arrancá.
+`Espacio` inicia y reinicia, `R` vuelve al selector y `Escape` corta el conteo.
+La duración elegida queda guardada en ese navegador para la próxima. Para probar
+sin esperar, `?min=2` o `?seg=20` en la URL.
+
+**Config** (todo opcional; sin el bloque, la sala existe igual con los textos
+por defecto):
+
+```ts
+waitingRoom: {
+  defaultMinutes: 10,
+  presetMinutes: [1, 5, 10, 15, 30],
+  intro: { title: "El taller está por", titleHighlight: "empezar" },
+  counting: { label: "Comenzamos en" },
+  final: { title: "¡Comenzamos!", body: "Bienvenido a la sesión." },
+  // Mensajes de una edición anterior, para que la sala no arranque en silencio:
+  chat: [{ name: "Ana", text: "¡Qué ganas de empezar!" }],
+  confetti: true,
+  fullscreen: true,
+}
+```
+
+Las burbujas son decorativas y salen del config: no son un chat en vivo ni
+pretenden pasar por uno. Si `chat` queda vacío, la capa no se monta.
 
 ---
 
