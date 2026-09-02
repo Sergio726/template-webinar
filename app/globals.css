@@ -1,0 +1,173 @@
+@import "tailwindcss";
+
+/*
+ * El `inline` NO es opcional.
+ *
+ * Sin el, Tailwind resuelve la indireccion var(--brand) una sola vez contra
+ * :root y la hornea en la utilidad. Cuando un evento redefine --brand en su
+ * contenedor, el cambio no llega a `bg-brand` y todas las landings del deploy
+ * terminan del mismo color. Con `inline`, la utilidad emite var(--brand) tal
+ * cual y el valor se resuelve en cascada donde se use.
+ */
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-dark: var(--brand-dark);
+  --color-brand-light: var(--brand-light);
+  --color-brand-wash: var(--brand-wash);
+  --color-on-brand: var(--on-brand);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-hairline: var(--hairline);
+  --color-elevated: var(--elevated);
+
+  --font-sans: var(--font-sans-active);
+  --font-display: var(--font-display-active);
+}
+
+/*
+ * Valores de arranque. Los usan el indice y la pagina 404, que no pertenecen a
+ * ningun evento; cada landing los pisa desde su layout.
+ */
+:root {
+  --brand: #2563eb;
+  --brand-dark: #1d4ed8;
+  --brand-light: #60a5fa;
+  --brand-wash: #e6edff;
+  --on-brand: #ffffff;
+  --ink: #101a2c;
+  --ink-muted: #5a6981;
+  --surface: #f7f8fb;
+  --surface-alt: #ffffff;
+  --hairline: rgba(16, 26, 44, 0.1);
+  --elevated: rgba(16, 26, 44, 0.04);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-pill: 9999px;
+  --font-sans-active: ui-sans-serif, system-ui, sans-serif;
+  --font-display-active: ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--surface);
+    color: var(--ink);
+    font-family: var(--font-sans-active);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* El ancla del formulario no debe quedar pegada al borde al hacer scroll. */
+  :target {
+    scroll-margin-top: 2rem;
+  }
+}
+
+/* Utilidades de radio atadas al token del tema. */
+.rounded-card {
+  border-radius: var(--radius-lg);
+}
+.rounded-control {
+  border-radius: var(--radius-md);
+}
+.rounded-pill {
+  border-radius: var(--radius-pill);
+}
+
+/*
+ * Barrido de luz del CTA principal. Portado del proyecto original, con los
+ * colores cambiados por tokens.
+ */
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+
+.cta-shine {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.cta-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: translateX(-120%) skewX(-20deg);
+  pointer-events: none;
+}
+
+.cta-shine:hover,
+.cta-shine:focus-visible {
+  transform: translateY(-2px);
+}
+
+.cta-shine:hover::after,
+.cta-shine:focus-visible::after {
+  animation: shine-sweep 0.7s ease-out;
+}
+
+.cta-shine:active {
+  transform: scale(0.98);
+}
+
+/* Barrido lento e infinito, para insignias de urgencia. */
+.badge-shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.badge-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 50%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transform: translateX(-120%) skewX(-20deg);
+  animation: shine-sweep 3s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .cta-shine,
+  .cta-shine:hover,
+  .cta-shine:focus-visible,
+  .cta-shine:active {
+    transform: none;
+  }
+
+  .cta-shine::after,
+  .badge-shine::after {
+    animation: none;
+    display: none;
+  }
+}
