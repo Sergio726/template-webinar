@@ -201,6 +201,21 @@ const richTextSection = z.object({
   paragraphs: z.array(z.string()).min(1),
 })
 
+/**
+ * Grilla de "esto es para vos si...". Deja que la persona se reconozca sola y
+ * filtra a quien no calza, antes de pedirle los datos.
+ */
+const audienceSection = z.object({
+  type: z.literal("audience"),
+  eyebrow: z.string().optional(),
+  title: z.string().optional(),
+  titleHighlight: z.string().optional(),
+  items: z.array(z.string().min(1)).min(1),
+  /** Cierre bajo la grilla, ej. "Negocios que ya venden y viven de citas". */
+  footnote: z.string().optional(),
+  columns: z.union([z.literal(1), z.literal(2), z.literal(3)]).default(2),
+})
+
 const formSection = z.object({
   type: z.literal("form"),
   eyebrow: z.string().optional(),
@@ -224,6 +239,7 @@ export const sectionSchema = z.discriminatedUnion("type", [
   speakerSection,
   ctaSection,
   richTextSection,
+  audienceSection,
   formSection,
 ])
 
@@ -338,6 +354,12 @@ const eventConfigObject = z.object({
     /** Pie de página, ej. "Consultora Ejemplo — Formación para equipos". */
     tagline: z.string().optional(),
     legal: z.string().optional(),
+    /**
+     * Descargo legal largo del pie: deslinde de las plataformas de anuncios,
+     * aviso de que los resultados no son tipicos, y de que habra una oferta.
+     * Meta exige algo asi para aprobar campanas que prometen resultados.
+     */
+    disclaimer: z.string().optional(),
     links: z
       .array(z.object({ label: z.string(), href: z.string() }))
       .default([]),
@@ -425,14 +447,6 @@ export const eventConfigSchema = eventConfigObject.superRefine((config, ctx) => 
       message: 'Falta la sección { type: "form" }: sin ella no hay dónde registrarse.',
     })
   }
-  if (formSections.length > 1) {
-    ctx.addIssue({
-      code: "custom",
-      path: ["sections"],
-      message: 'Hay más de una sección { type: "form" }; solo puede haber una.',
-    })
-  }
-
   const names = config.form.fields.map((f) => f.name)
   const duplicated = names.filter((name, i) => names.indexOf(name) !== i)
   if (duplicated.length > 0) {

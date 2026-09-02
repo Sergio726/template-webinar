@@ -5,10 +5,10 @@
  * datos en vez de dos objetos paralelos. El país no es un campo del formulario:
  * se deriva del prefijo que la persona elige, igual que en el original.
  *
- * La bandera se dibuja con el emoji derivado del código ISO (dos letras →
- * dos "regional indicator symbols"), así no hace falta ninguna dependencia de
- * iconos. En Windows, Chrome no pinta emojis de bandera y muestra las dos
- * letras: es un degradado aceptable y sigue siendo legible.
+ * El país se identifica con su código ISO en mayúsculas, no con un emoji de
+ * bandera: Chrome en Windows no dibuja esos emojis y los muestra como dos
+ * letras minúsculas sueltas, que se leen peor que el código. Así se ve igual
+ * en todos los sistemas y no hace falta ninguna dependencia de iconos.
  */
 
 export type Country = {
@@ -42,15 +42,17 @@ export const COUNTRIES: Country[] = [
   { iso: "PR", dial: "+1787", name: "Puerto Rico" },
   { iso: "UY", dial: "+598", name: "Uruguay" },
   { iso: "VE", dial: "+58", name: "Venezuela" },
+  // Europa: buena parte de la audiencia latina vive alla.
+  { iso: "IT", dial: "+39", name: "Italia" },
+  { iso: "PT", dial: "+351", name: "Portugal" },
+  { iso: "FR", dial: "+33", name: "Francia" },
+  { iso: "DE", dial: "+49", name: "Alemania" },
+  { iso: "GB", dial: "+44", name: "Reino Unido" },
 ]
 
-/** Convierte "CO" en 🇨🇴 sin necesidad de un set de iconos. */
-export function isoToFlagEmoji(iso: string): string {
-  return iso
-    .toUpperCase()
-    .split("")
-    .map((char) => String.fromCodePoint(127397 + char.charCodeAt(0)))
-    .join("")
+/** Código de dos letras en mayúsculas, para mostrar junto al prefijo. */
+export function isoLabel(iso: string): string {
+  return iso.toUpperCase()
 }
 
 export function findCountryByDial(dial: string): Country | undefined {

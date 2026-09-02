@@ -33,12 +33,35 @@ export function ClientBridges({
     trackPageView(analytics, slug)
   }, [analytics, slug])
 
+  // Entrar con /evento#registro desde un anuncio: el navegador intenta saltar
+  // con el HTML inicial, pero las fuentes y las imagenes todavia estan
+  // acomodandose y el destino se corre. Repetimos el salto una vez montados,
+  // cuando la pagina ya tiene su altura definitiva.
+  useEffect(() => {
+    if (window.location.hash !== `#${FORM_ANCHOR_ID}`) return
+
+    const target = document.getElementById(FORM_ANCHOR_ID)
+    if (!target) return
+
+    // Sin animacion: quien llega por este enlace espera aterrizar ahi, no ver
+    // la pagina entera desfilar.
+    target.scrollIntoView({ behavior: "instant", block: "start" })
+    window.dispatchEvent(new CustomEvent(FOCUS_FORM_EVENT))
+  }, [])
+
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement | null
       const anchor = target?.closest?.(`a[href="#${FORM_ANCHOR_ID}"]`)
       if (!anchor) return
-      // El scroll lo hace el navegador con el ancla nativa; aca solo pedimos foco.
+
+      // El scroll se hace a mano, no se delega al ancla: si la URL ya termina
+      // en #registro (porque la persona llego por ese enlace, o ya toco otro
+      // CTA), el navegador considera que no hay nada que hacer y el boton
+      // queda muerto.
+      event.preventDefault()
+      document.getElementById(FORM_ANCHOR_ID)?.scrollIntoView({ behavior: "smooth" })
+      window.history.replaceState(null, "", `#${FORM_ANCHOR_ID}`)
       window.dispatchEvent(new CustomEvent(FOCUS_FORM_EVENT))
     }
 

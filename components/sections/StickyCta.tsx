@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { AnimatePresence, motion } from "motion/react"
 import { CtaButton } from "@/components/ui/CtaButton"
-import { FORM_ANCHOR_ID } from "@/lib/scroll"
+import { FORM_ANCHOR_ID, REGISTERED_EVENT } from "@/lib/scroll"
 
 /**
  * Barra fija que aparece al hacer scroll y se retira sola cuando el formulario
@@ -16,12 +16,21 @@ import { FORM_ANCHOR_ID } from "@/lib/scroll"
 export function StickyCta({ label }: { label: string }) {
   const [scrolled, setScrolled] = useState(false)
   const [formVisible, setFormVisible] = useState(false)
+  const [registered, setRegistered] = useState(false)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > window.innerHeight * 0.7)
     onScroll()
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  // Una vez que la persona se registro, seguir insistiendo con "reserva tu
+  // lugar" es ruido: ya lo hizo.
+  useEffect(() => {
+    const onRegistered = () => setRegistered(true)
+    window.addEventListener(REGISTERED_EVENT, onRegistered)
+    return () => window.removeEventListener(REGISTERED_EVENT, onRegistered)
   }, [])
 
   useEffect(() => {
@@ -36,7 +45,7 @@ export function StickyCta({ label }: { label: string }) {
     return () => observer.disconnect()
   }, [])
 
-  const visible = scrolled && !formVisible
+  const visible = scrolled && !formVisible && !registered
 
   return (
     <AnimatePresence>

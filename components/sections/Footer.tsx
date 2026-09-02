@@ -29,6 +29,16 @@ export function Footer({ config }: { config: EventConfig }) {
       <p className="text-surface/40 mt-4 text-xs">
         {brand.legal ?? `© ${new Date().getFullYear()} ${brand.name}. Todos los derechos reservados.`}
       </p>
+
+      {/*
+        Descargo legal. Va deliberadamente en cuerpo chico y bajo contraste: hay
+        que publicarlo, pero no compite con el resto de la pagina.
+      */}
+      {brand.disclaimer ? (
+        <p className="text-surface/35 mx-auto mt-6 max-w-3xl text-[11px] leading-relaxed">
+          {brand.disclaimer}
+        </p>
+      ) : null}
     </footer>
   )
 }

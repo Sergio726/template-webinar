@@ -2,15 +2,15 @@
 
 import { useEffect, useRef, useState } from "react"
 import { ChevronDown } from "lucide-react"
-import { COUNTRIES, isoToFlagEmoji } from "@/lib/countries"
+import { COUNTRIES, isoLabel } from "@/lib/countries"
 import { cn } from "@/lib/utils"
 
 /**
  * Teléfono con selector de país.
  *
- * Es el selector de banderas del proyecto original, con la lista movida a
- * `lib/countries.ts` y la dependencia de iconos reemplazada por el emoji que se
- * deriva del código ISO. El país no se pregunta: se deduce del prefijo elegido.
+ * Es el selector de país del proyecto original, con la lista movida a
+ * `lib/countries.ts` y sin su dependencia de iconos: cada país se identifica
+ * con su código ISO. El país no se pregunta, se deduce del prefijo elegido.
  */
 export function PhoneField({
   id,
@@ -62,7 +62,9 @@ export function PhoneField({
         aria-label={`Prefijo telefónico: ${selected.name}`}
         className="rounded-control border-hairline bg-surface-alt text-ink focus-visible:border-brand focus-visible:ring-brand/25 flex h-11 shrink-0 items-center gap-1.5 border px-3 text-sm outline-none focus-visible:ring-2"
       >
-        <span aria-hidden>{isoToFlagEmoji(selected.iso)}</span>
+        <span className="text-ink-muted text-xs font-semibold" aria-hidden>
+          {isoLabel(selected.iso)}
+        </span>
         <span className="tabular-nums">{selected.dial}</span>
         <ChevronDown className="text-ink-muted h-3.5 w-3.5" aria-hidden />
       </button>
@@ -103,7 +105,9 @@ export function PhoneField({
                   country.dial === dialCode && "bg-brand-wash font-medium"
                 )}
               >
-                <span aria-hidden>{isoToFlagEmoji(country.iso)}</span>
+                <span className="text-ink-muted w-6 shrink-0 text-xs font-semibold" aria-hidden>
+                  {isoLabel(country.iso)}
+                </span>
                 <span className="text-ink flex-1 truncate">{country.name}</span>
                 <span className="text-ink-muted tabular-nums">{country.dial}</span>
               </button>

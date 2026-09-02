@@ -67,7 +67,8 @@ export default async function EventPage({
   if (!config) notFound()
 
   return (
-    <main>
+    // El espacio extra abajo evita que la barra fija tape el pie de pagina.
+    <main className={config.stickyCta ? "pb-20" : undefined}>
       <SectionRenderer config={config} />
       {config.stickyCta ? <StickyCta label={config.stickyCta.label} /> : null}
     </main>

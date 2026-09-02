@@ -7,6 +7,7 @@ import { Icon } from "@/components/ui/Icon"
 import { RichText } from "@/components/ui/RichText"
 import { Reveal } from "@/components/ui/Reveal"
 import { FORM_ANCHOR_ID } from "@/lib/scroll"
+import { cn } from "@/lib/utils"
 import type { EventConfig, SectionOf } from "@/lib/types"
 
 /**
@@ -29,7 +30,16 @@ export function Hero({
     <section className="bg-surface relative flex min-h-[85vh] flex-col justify-center px-4 py-16 sm:py-20">
       <Backdrop variant={theme.backdrop} />
 
-      <div className="relative mx-auto grid w-full max-w-5xl items-center gap-10 lg:grid-cols-[1.4fr_1fr]">
+      {/*
+        La segunda columna solo existe si hay retrato. Sin el, una grilla de dos
+        columnas dejaria media pantalla vacia a la derecha.
+      */}
+      <div
+        className={cn(
+          "relative mx-auto grid w-full max-w-5xl items-center gap-10",
+          section.portrait && "lg:grid-cols-[1.4fr_1fr]"
+        )}
+      >
         <div>
           {brand.logo?.light ? (
             <Image

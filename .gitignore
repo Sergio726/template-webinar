@@ -46,3 +46,7 @@ next-env.d.ts
 
 # El ejemplo si se versiona: documenta que variables hacen falta.
 !.env.example
+
+# Next 16 regenera estos archivos en cada build; no aportan al repo.
+AGENTS.md
+CLAUDE.md

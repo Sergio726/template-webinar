@@ -22,6 +22,10 @@ export default defineEvent({
   brand: {
     name: "Tu organización",
     tagline: "Opcional: bajada del pie de página",
+    // Descargo legal del pie. Si vas a correr anuncios en Meta, ponelo:
+    // deslinde de la plataforma, aviso de que los resultados no son típicos y
+    // de que al final habrá una oferta.
+    // disclaimer: "Este sitio no forma parte ni está respaldado por…",
     // logo: { light: "/eventos/mi-webinar/logo.svg" },
     links: [],
   },
@@ -157,7 +161,13 @@ export default defineEvent({
         { q: "¿Queda grabado?", a: "Sí, enviamos la grabación a quienes se registren." },
       ],
     },
+    // Podés repetir el formulario: uno apenas termina la portada y otro al
+    // final. Comparten estado, así que registrarse en uno actualiza el otro.
+    //
     // Otras secciones disponibles, en el orden que quieras:
+    // { type: "audience", title: "Esto es para vos si sos...",
+    //   items: ["Agencias", "Consultorios", "Restaurantes"],
+    //   footnote: "Negocios que ya venden." }
     // { type: "tension", title: "...", paragraphs: ["..."] }
     // { type: "roadmap", items: [{ title: "...", current: true }] }
     // { type: "testimonials", items: [{ quote: "...", name: "..." }] }

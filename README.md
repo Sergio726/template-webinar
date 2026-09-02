@@ -68,10 +68,18 @@ array no existe. No hay banderas de "mostrar sí/no": para sacar la hoja de ruta
 se borra el bloque `{ type: "roadmap", ... }`.
 
 Tipos disponibles: `hero`, `benefits`, `tension`, `roadmap`, `testimonials`,
-`form`, `faq`, `speaker`, `cta`, `richText`. El pie de página se agrega siempre.
+`audience`, `form`, `faq`, `speaker`, `cta`, `richText`. El pie de página se
+agrega siempre.
 
-La sección `form` tiene que estar exactamente una vez; si falta o está repetida,
-el build falla avisando.
+**El formulario puede repetirse.** Ponelo arriba, apenas termina la portada, y
+otra vez al final: quien ya viene decidido no tiene que buscar dónde anotarse, y
+quien necesita leer todo lo encuentra al terminar. Las dos instancias comparten
+el estado — si alguien se registra en una, la otra pasa sola a la pantalla de
+confirmación y la barra fija se retira. Tiene que haber al menos una; si no hay
+ninguna, el build falla avisando.
+
+`audience` es la grilla de "esto es para vos si sos…": deja que la persona se
+reconozca en la lista y filtra a quien no calza antes de pedirle los datos.
 
 ### Temas
 
@@ -177,6 +185,9 @@ Requiere Node 20.9 o superior.
   salen del config. Para bajar una landing, `enabled: false`.
 - **El config se valida al compilar.** Un evento incoherente rompe el build con
   la ruta exacta del error, en vez de fallar en producción.
+- **Descargo legal.** `brand.disclaimer` imprime un bloque de texto legal al pie
+  (no afiliado a la plataforma de anuncios, resultados no típicos, aviso de que
+  habrá una oferta). En la práctica hace falta para que Meta apruebe campañas.
 - **TypeScript 5.9, no 7.** La 7.0 es el compilador nuevo escrito en Go y ya es
   la versión `latest`, pero salió hace poco. Cuando quieras probarla, es cambiar
   una línea del `package.json`.

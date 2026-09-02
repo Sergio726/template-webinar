@@ -8,8 +8,10 @@ import { Faq } from "./Faq"
 import { Speaker } from "./Speaker"
 import { CtaBlock } from "./CtaBlock"
 import { RichTextBlock } from "./RichTextBlock"
+import { Audience } from "./Audience"
 import { RegistrationForm } from "./RegistrationForm"
 import { Footer } from "./Footer"
+import { isRegistrationClosed } from "@/lib/registration"
 import type { EventConfig, SectionConfig, SectionType } from "@/lib/types"
 
 /**
@@ -20,7 +22,12 @@ import type { EventConfig, SectionConfig, SectionType } from "@/lib/types"
  * compila hasta registrarla acá. Es exactamente el olvido que queremos que el
  * compilador atrape.
  */
-type SectionProps = { section: never; config: EventConfig; initiallyClosed: boolean }
+type SectionProps = {
+  section: never
+  config: EventConfig
+  initiallyClosed: boolean
+  isPrimary: boolean
+}
 
 const SECTION_COMPONENTS = {
   hero: Hero,
@@ -32,6 +39,7 @@ const SECTION_COMPONENTS = {
   speaker: Speaker,
   cta: CtaBlock,
   richText: RichTextBlock,
+  audience: Audience,
   form: RegistrationForm,
 } satisfies Record<SectionType, ComponentType<SectionProps>>
 
@@ -43,8 +51,11 @@ export function SectionRenderer({ config }: { config: EventConfig }) {
   // El cierre se evalua aca, en el servidor, y viaja como estado inicial del
   // formulario. Sin esto, una landing ya vencida mostraria el formulario un
   // instante antes de que el navegador descubra la hora y lo reemplace.
-  const closesAt = config.event.registrationClosesAt
-  const initiallyClosed = Boolean(closesAt && Date.now() > new Date(closesAt).getTime())
+  const initiallyClosed = isRegistrationClosed(config)
+
+  // Una landing puede repetir el formulario (arriba y al final). El primero se
+  // queda con el ancla #registro, que tiene que ser unica en el documento.
+  const firstFormIndex = config.sections.findIndex((section) => section.type === "form")
 
   return (
     <>
@@ -53,6 +64,7 @@ export function SectionRenderer({ config }: { config: EventConfig }) {
           section: SectionConfig
           config: EventConfig
           initiallyClosed: boolean
+          isPrimary: boolean
         }>
 
         return (
@@ -61,6 +73,7 @@ export function SectionRenderer({ config }: { config: EventConfig }) {
             section={section}
             config={config}
             initiallyClosed={initiallyClosed}
+            isPrimary={index === firstFormIndex}
           />
         )
       })}

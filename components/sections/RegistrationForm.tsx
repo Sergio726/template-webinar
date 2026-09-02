@@ -11,8 +11,9 @@ import { SuccessCard } from "@/components/form/SuccessCard"
 import { buildFormSchema, emptyValues, type FormValues } from "@/lib/form-schema"
 import { readAttribution, getFbpFbc } from "@/lib/attribution"
 import { trackRegistration } from "@/lib/tracking"
-import { FORM_ANCHOR_ID, FOCUS_FORM_EVENT } from "@/lib/scroll"
+import { FORM_ANCHOR_ID, FOCUS_FORM_EVENT, FORM_MARKER, REGISTERED_EVENT } from "@/lib/scroll"
 import { useOfferWindow } from "@/lib/use-offer-window"
+import { stamp } from "@/lib/registration"
 import type { EventConfig, SectionOf } from "@/lib/types"
 
 /**
@@ -27,11 +28,14 @@ export function RegistrationForm({
   section,
   config,
   initiallyClosed = false,
+  isPrimary = true,
 }: {
   section: SectionOf<"form">
   config: EventConfig
   /** Estado calculado en el servidor; evita el parpadeo al hidratar. */
   initiallyClosed?: boolean
+  /** Solo el primer formulario de la pagina lleva el ancla #registro. */
+  isPrimary?: boolean
 }) {
   const { form, event, analytics, slug } = config
 
@@ -46,8 +50,8 @@ export function RegistrationForm({
   const [submitted, setSubmitted] = useState(false)
 
   const firstFieldRef = useRef<HTMLInputElement>(null)
-  // Marca temporal de renderizado: un envío casi instantáneo delata un bot.
-  const renderedAt = useRef(Date.now())
+  // Marca temporal de apertura: un envío casi instantáneo delata un bot.
+  const renderedAt = useRef(stamp())
   const [honeypot, setHoneypot] = useState("")
 
   const { expired, ready } = useOfferWindow(form.closed ? event.registrationClosesAt : null)
@@ -57,6 +61,14 @@ export function RegistrationForm({
     const onFocusRequest = () => firstFieldRef.current?.focus()
     window.addEventListener(FOCUS_FORM_EVENT, onFocusRequest)
     return () => window.removeEventListener(FOCUS_FORM_EVENT, onFocusRequest)
+  }, [])
+
+  // Si otra instancia del formulario ya recibio el registro, esta se pone al
+  // dia sola en vez de seguir pidiendo datos que la persona ya dio.
+  useEffect(() => {
+    const onRegistered = () => setSubmitted(true)
+    window.addEventListener(REGISTERED_EVENT, onRegistered)
+    return () => window.removeEventListener(REGISTERED_EVENT, onRegistered)
   }, [])
 
   const handleChange = useCallback((name: string, value: string) => {
@@ -117,6 +129,9 @@ export function RegistrationForm({
 
         trackRegistration(analytics, slug, eventId)
         setSubmitted(true)
+        // Una pagina puede tener el formulario arriba y repetido al final. Si
+        // se envia uno, los otros tienen que dejar de pedir los mismos datos.
+        window.dispatchEvent(new CustomEvent(REGISTERED_EVENT))
       } catch (error) {
         setSubmitError(
           error instanceof Error && error.message
@@ -137,7 +152,13 @@ export function RegistrationForm({
   const isClosed = Boolean(form.closed) && (ready ? expired : initiallyClosed)
 
   return (
-    <section id={FORM_ANCHOR_ID} className="bg-surface scroll-mt-8 px-4 py-16 sm:py-20">
+    <section
+      // El ancla es unica en el documento, asi que la lleva el primero; los
+      // demas quedan marcados para que el scroll sepa que existen.
+      id={isPrimary ? FORM_ANCHOR_ID : undefined}
+      {...{ [FORM_MARKER]: "" }}
+      className="bg-surface scroll-mt-8 px-4 py-16 sm:py-20"
+    >
       <div className="mx-auto w-full max-w-lg">
         <AnimatePresence mode="wait">
           {isClosed ? (

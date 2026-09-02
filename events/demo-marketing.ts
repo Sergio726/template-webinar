@@ -14,6 +14,8 @@ export default defineEvent({
   brand: {
     name: "Estudio Norte",
     tagline: "Crecimiento para negocios que ya facturan",
+    disclaimer:
+      "Este sitio no forma parte ni está respaldado por Meta Platforms, Inc. Facebook e Instagram son marcas de Meta Platforms, Inc. Los resultados mencionados corresponden a la experiencia de quien presenta y de sus clientes: no son típicos ni están garantizados, y los tuyos dependerán de tu negocio, tu experiencia y tu ejecución. Este taller es gratuito y no te compromete a nada. Al final haremos una oferta opcional para quienes quieran nuestra ayuda para implementarlo más rápido.",
     links: [
       { label: "Aviso de privacidad", href: "/privacidad" },
       { label: "Términos", href: "/terminos" },
@@ -120,6 +122,16 @@ export default defineEvent({
       showCountdown: true,
     },
     {
+      type: "form",
+      eyebrow: "Paso 1",
+      headline: "Asegurá tu lugar",
+      headlineHighlight: "ahora",
+      subcopy: "Te mandamos el enlace de acceso apenas te registres.",
+      submitLabel: "Quiero asistir al webinar",
+      submittingLabel: "Reservando...",
+      disclaimer: "Evento sin costo, en vivo por Zoom. No enviamos spam y podés darte de baja cuando quieras.",
+    },
+    {
       type: "benefits",
       eyebrow: "Qué te llevás",
       title: "Salís de la sesión con",
@@ -156,6 +168,24 @@ export default defineEvent({
         { title: "Retener y hacer crecer las cuentas que ya tenés", status: "Próximamente", current: false },
       ],
       cta: { label: "Empezar por el primero", icon: "ArrowRight" },
+    },
+    {
+      type: "audience",
+      eyebrow: "Para quién es",
+      title: "Este webinar es para",
+      titleHighlight: "negocios de servicios como",
+      columns: 2,
+      items: [
+        "Agencias de marketing",
+        "Estudios contables",
+        "Consultoras de RR.HH.",
+        "Estudios jurídicos",
+        "Arquitectos y constructoras",
+        "Consultores y terapeutas",
+        "Agencias de diseño",
+        "Asesores financieros",
+      ],
+      footnote: "Negocios que ya venden y quieren dejar de depender del boca a boca.",
     },
     {
       type: "testimonials",
