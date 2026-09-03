@@ -15,12 +15,21 @@ import type { LucideProps } from "lucide-react"
 
 type IconRegistry = Record<string, unknown>
 
+/**
+ * Desde lucide-react 1.x los iconos no son funciones sueltas: vienen envueltos
+ * (forwardRef, memo), o sea que son objetos con `$$typeof`. Chequear solo por
+ * `typeof === "function"` los descartaba a todos y la landing se quedaba sin un
+ * solo icono, en silencio y sin romper nada.
+ */
+function isComponent(candidate: unknown): candidate is React.ComponentType<LucideProps> {
+  if (typeof candidate === "function") return true
+  return typeof candidate === "object" && candidate !== null && "$$typeof" in candidate
+}
+
 function resolveIcon(name?: string | null) {
   if (!name) return null
   const candidate = (icons as IconRegistry)[name]
-  return typeof candidate === "function"
-    ? (candidate as React.ComponentType<LucideProps>)
-    : null
+  return isComponent(candidate) ? candidate : null
 }
 
 export function Icon({

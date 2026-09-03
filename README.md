@@ -13,6 +13,12 @@ npm run dev                    # http://localhost:3000
 Vienen dos eventos de ejemplo, de rubros distintos a propósito, para que se vea
 que el diseño no está pegado a un negocio: `/demo-marketing` y `/demo-salud`.
 
+**¿No programás?** Hay una guía para publicar una landing completa —con la web en
+Vercel y los registros cayendo en una hoja de Google— pidiéndoselo a Claude Code
+en español: [docs/GUIA-SIN-CODIGO.md](docs/GUIA-SIN-CODIGO.md). El script que
+conecta el formulario con la hoja está en
+[docs/apps-script-registros.gs](docs/apps-script-registros.gs).
+
 ---
 
 ## Crear un webinar nuevo
